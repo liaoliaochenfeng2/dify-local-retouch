@@ -19,4 +19,4 @@
 
 不要在公开 Issue 中发布私人照片、密钥或私密日志。具体部署中的数据访问和删除请求应由该平台运营方处理。
 
-Contact: REPLACE_WITH_CONTACT_EMAIL
+Contact: 2748836629@qq.com

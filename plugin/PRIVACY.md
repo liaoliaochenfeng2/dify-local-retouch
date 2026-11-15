@@ -34,4 +34,4 @@ Issue tracker: https://github.com/liaoliaochenfeng2/dify-local-retouch/issues
 
 Do not post personal photographs, credentials or private logs in a public issue. The hosting operator is the appropriate contact for access to, or deletion of, data in a particular Dify deployment.
 
-Contact: REPLACE_WITH_CONTACT_EMAIL
+Contact: 2748836629@qq.com

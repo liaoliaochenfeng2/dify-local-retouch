@@ -18,7 +18,7 @@ It does not call an image-generation API, download model weights, execute genera
 
 Once approved and listed, install the package through your Dify Marketplace interface. Until then, local package installation is possible only where your deployment policy permits it. Installing this plugin adds two tools; it does not automatically create a complete conversational editing application. Configure the tools in a Chatflow and bind trusted system variables as described below. Do not bypass a host's plugin verification policy.
 
-This public source is a release candidate under the confirmed publisher `liaoliaochenfeng2`. Local core tests and SDK checks pass, but live Dify installation verification and a public contact email remain pending. No Marketplace pull request has been submitted. Submission and approval are separate steps.
+The publisher is `liaoliaochenfeng2`. Local core tests and real SDK checks pass; live Dify installation verification has not been completed. See `PUBLICATION.md` in the source repository for the current submission and review status. A submission does not imply Marketplace approval.
 
 ## Tools and safe variable binding
 
@@ -113,4 +113,4 @@ This is a conventional image-processing tool. It does not generate a new photogr
 
 Skin protection is a color heuristic that reduces some changes; it is not face recognition, semantic skin segmentation or an exact protection guarantee. Exposure and curves cannot recover detail already clipped in the source. Review outputs and masks before delivery.
 
-Contact: REPLACE_WITH_CONTACT_EMAIL
+Contact: 2748836629@qq.com

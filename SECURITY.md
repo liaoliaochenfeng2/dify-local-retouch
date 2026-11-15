@@ -14,4 +14,4 @@ Source and support: https://github.com/liaoliaochenfeng2/dify-local-retouch
 
 If the repository offers private vulnerability reporting, use it for security issues. Otherwise open a minimal issue requesting a private contact channel, without publishing exploit data, personal images, credentials or sensitive logs. No independent security audit or production isolation certification is claimed.
 
-Contact: REPLACE_WITH_CONTACT_EMAIL
+Contact: 2748836629@qq.com

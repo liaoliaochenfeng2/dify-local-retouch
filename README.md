@@ -8,9 +8,9 @@ See [plugin documentation](plugin/README.md),
 [privacy policy](plugin/PRIVACY.md), and [publication status](PUBLICATION.md).
 
 This public source repository is maintained under `liaoliaochenfeng2`. Version
-0.1.1 is a release candidate, not an approved Marketplace listing. No Marketplace
-pull request has been submitted. A public contact email, live Dify installation
-verification and Marketplace review remain outstanding.
+0.1.1 is prepared for Marketplace review; see PUBLICATION.md for the current
+submission status. Live Dify installation verification remains outstanding,
+and submission does not imply approval.
 
 ## Build
 
@@ -25,9 +25,8 @@ replace installation and end-to-end testing in a running Dify instance.
 
 ## Publisher metadata
 
-The publisher and public repository are confirmed. After selecting a real,
-monitored email address suitable for public disclosure, bind the remaining
-contact metadata:
+Publisher, repository and public contact metadata are bound for this submission.
+Maintainers can bind metadata for future releases with:
 
 ```bash
 python bind_publisher.py --author liaoliaochenfeng2 --repository https://github.com/liaoliaochenfeng2/dify-local-retouch --contact-email YOUR_PUBLIC_EMAIL
