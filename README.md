@@ -8,7 +8,7 @@ See [plugin documentation](plugin/README.md),
 [privacy policy](plugin/PRIVACY.md), and [publication status](PUBLICATION.md).
 
 This public source repository is maintained under `liaoliaochenfeng2`. Version
-0.1.1 is prepared for Marketplace review; see PUBLICATION.md for the current
+0.1.1 is submitted in [Marketplace PR #3776](https://github.com/langgenius/dify-plugins/pull/3776); see PUBLICATION.md for the current
 submission status. Live Dify installation verification remains outstanding,
 and submission does not imply approval.
 

@@ -17,7 +17,7 @@ installation result. See PUBLICATION.md for the current submission status.
 
 - The toolkit warns that `opencv-python-headless` is a large runtime dependency requiring reviewer approval. It is used for bilateral smoothing, inpainting, GrabCut, image remapping and color operations; no model weights or executable files are bundled in the package.
 - The full Dify Community/Cloud installation and conversational workflow have not been tested in a live host. Local SDK registration does not establish host permissions, file transport, cache configuration or model-driven workflow behavior.
-- PR checks, Marketplace duplicate-version checks and maintainer review have not run.
+- PR checks, Marketplace duplicate-version checks and maintainer review are tracked in https://github.com/langgenius/dify-plugins/pull/3776. Local results do not establish their outcome.
 
 ## Reproduce local tests
 
