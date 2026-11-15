@@ -1,0 +1,153 @@
+identity:
+  author: liaoliaochenfeng2
+  name: retouch
+  label:
+    en_US: Render a local retouch plan
+    zh_Hans: 执行本地修图方案
+description:
+  human:
+    en_US: Replay a strict V2 JSON edit plan from the original source. preview returns
+      low-resolution A/B variants; final returns a full-resolution PNG and processing
+      report. Cache failures are reported honestly. Python code is never executed.
+    zh_Hans: 从原始source重放V2严格JSON修图方案。preview输出A/B低分辨率小样，final输出全尺寸PNG及处理记录；缓存失败不伪装已保存，不执行Python代码。
+  llm: Replay a strict V2 JSON edit plan from the original source. preview returns
+    low-resolution A/B variants; final returns a full-resolution PNG and processing
+    report. Cache failures are reported honestly. Python code is never executed.
+class_name: RetouchTool
+parameters:
+- name: user_id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: User Id
+    zh_Hans: 平台用户标识
+  human_description:
+    en_US: Bind directly to sys.user_id. Never generate this value with a language
+      model.
+    zh_Hans: 必须直接绑定sys.user_id，禁止由语言模型生成。
+  llm_description: Bind directly to sys.user_id. Never generate this value with a
+    language model.
+- name: conversation_id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Conversation Id
+    zh_Hans: 平台会话标识
+  human_description:
+    en_US: Bind directly to sys.conversation_id. Never generate this value with a
+      language model.
+    zh_Hans: 必须直接绑定sys.conversation_id，禁止由语言模型生成。
+  llm_description: Bind directly to sys.conversation_id. Never generate this value
+    with a language model.
+- name: source_image
+  type: file
+  required: true
+  form: llm
+  label:
+    en_US: Source Image
+    zh_Hans: 原图
+  human_description:
+    en_US: The source_original file from prepare. Every render starts from the original;
+      never substitute a previous output for it.
+    zh_Hans: prepare输出的source_original文件；每次从同一原始素材重算，禁止把上次成品冒充原图。
+  llm_description: The source_original file from prepare. Every render starts from
+    the original; never substitute a previous output for it.
+- name: reference_image
+  type: file
+  required: false
+  form: llm
+  label:
+    en_US: Reference Image
+    zh_Hans: 风格参考图
+  human_description:
+    en_US: The reference_original file from prepare, used only by reference_match.
+      Do not use it as a mask or replacement background.
+    zh_Hans: prepare输出的reference_original文件，仅用于reference_match，不得当作蒙版或替换背景。
+  llm_description: The reference_original file from prepare, used only by reference_match.
+    Do not use it as a mask or replacement background.
+- name: mask_image
+  type: file
+  required: false
+  form: llm
+  label:
+    en_US: Mask Image
+    zh_Hans: 黑白蒙版
+  human_description:
+    en_US: The mask_original file from prepare, matching the oriented original dimensions.
+      White marks the edit area; for background replacement, white preserves the foreground.
+    zh_Hans: prepare输出的mask_original文件，尺寸须与转正后的原图一致。白色为修改区域，换背景时白色保留主体。
+  llm_description: The mask_original file from prepare, matching the oriented original
+    dimensions. White marks the edit area; for background replacement, white preserves
+    the foreground.
+- name: background_image
+  type: file
+  required: false
+  form: llm
+  label:
+    en_US: Background Image
+    zh_Hans: 新背景素材
+  human_description:
+    en_US: The background_original file from prepare, used only for explicitly requested
+      background replacement.
+    zh_Hans: prepare输出的background_original文件，仅用于用户明确要求的背景替换。
+  llm_description: The background_original file from prepare, used only for explicitly
+    requested background replacement.
+- name: plan_json
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Plan Json
+    zh_Hans: 完整修图计划JSON
+  human_description:
+    en_US: 'Strict JSON: mode=final/preview, explanation, variants=[{id:A or B,label,recipe:{version:2,operations:[...]}}].
+      final requires exactly one variant; preview requires exactly two, ordered A
+      then B.'
+    zh_Hans: 严格JSON：mode=final/preview, explanation, variants=[{id:A或B,label,recipe:{version:2,operations:[...]}}]。final严格一个候选，preview按A/B顺序严格两个。
+  llm_description: 'Strict JSON: mode=final/preview, explanation, variants=[{id:A
+    or B,label,recipe:{version:2,operations:[...]}}]. final requires exactly one variant;
+    preview requires exactly two, ordered A then B.'
+- name: source_sha256
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Source Sha256
+    zh_Hans: 原图指纹
+  human_description:
+    en_US: Bind directly to prepare.source_sha256. Never generate this value with
+      a model.
+    zh_Hans: 直接绑定prepare.source_sha256，不由模型生成。
+  llm_description: Bind directly to prepare.source_sha256. Never generate this value
+    with a model.
+- name: context_revision
+  type: string
+  required: false
+  form: llm
+  label:
+    en_US: Context Revision
+    zh_Hans: 会话版本
+  human_description:
+    en_US: Bind directly to prepare.context_revision; may be empty.
+    zh_Hans: 直接绑定prepare.context_revision，可为空。
+  llm_description: Bind directly to prepare.context_revision; may be empty.
+output_schema:
+  type: object
+  properties:
+    status:
+      type: string
+      description: success/error
+    mode:
+      type: string
+      description: final/preview, or empty on failure
+    summary:
+      type: string
+      description: Actual execution result and cache notices
+    report_json:
+      type: string
+      description: Actual processing reports for each variant and cache warnings
+extra:
+  python:
+    source: tools/retouch.py

@@ -1,0 +1,16 @@
+identity:
+  author: liaoliaochenfeng2
+  name: local_retouch
+  label:
+    en_US: Local Retouch Studio
+    zh_Hans: 小润本地修图工具
+  description:
+    en_US: Local CPU image processing without service credentials.
+    zh_Hans: 无需服务密钥的本地图片处理工具。
+  icon: icon.svg
+tools:
+- tools/prepare.yaml
+- tools/retouch.yaml
+extra:
+  python:
+    source: provider/local_retouch.py

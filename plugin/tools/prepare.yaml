@@ -1,0 +1,128 @@
+identity:
+  author: liaoliaochenfeng2
+  name: prepare
+  label:
+    en_US: Prepare retouch assets and context
+    zh_Hans: 准备修图素材与上下文
+description:
+  human:
+    en_US: Resolve explicit image roles, read cached session assets and explicitly
+      saved preferences, and return original files plus thumbnails for visual analysis.
+      No external image API, remote execution service, or model-weight download is
+      used.
+    zh_Hans: 解析明确的素材角色，读取本地会话素材及显式保存的偏好，输出原始素材和只供识图的缩略图。无外部模型或网络下载。
+  llm: Resolve explicit image roles, read cached session assets and explicitly saved
+    preferences, and return original files plus thumbnails for visual analysis. No
+    external image API, remote execution service, or model-weight download is used.
+class_name: PrepareTool
+parameters:
+- name: user_id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: User Id
+    zh_Hans: 平台用户标识
+  human_description:
+    en_US: Bind directly to sys.user_id. Never generate this value with a language
+      model.
+    zh_Hans: 必须直接绑定sys.user_id，禁止由语言模型生成。
+  llm_description: Bind directly to sys.user_id. Never generate this value with a
+    language model.
+- name: conversation_id
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Conversation Id
+    zh_Hans: 平台会话标识
+  human_description:
+    en_US: Bind directly to sys.conversation_id. Never generate this value with a
+      language model.
+    zh_Hans: 必须直接绑定sys.conversation_id，禁止由语言模型生成。
+  llm_description: Bind directly to sys.conversation_id. Never generate this value
+    with a language model.
+- name: images
+  type: files
+  required: false
+  form: llm
+  label:
+    en_US: Images
+    zh_Hans: 本轮上传图片
+  human_description:
+    en_US: Bind to sys.files. Accepts at most 4 images, assigned source/reference/mask/background
+      roles in request_json.asset_roles.
+    zh_Hans: 绑定sys.files。最多4张，按request_json.asset_roles明确原图/参考图/蒙版/背景。
+  llm_description: Bind to sys.files. Accepts at most 4 images, assigned source/reference/mask/background
+    roles in request_json.asset_roles.
+- name: request_json
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Request Json
+    zh_Hans: 素材与控制请求JSON
+  human_description:
+    en_US: 'Strict JSON object: action=edit/select/reset/reset_preferences/preferences/help;
+      asset_roles in upload order; selected_id=A/B or empty; preference_notes with
+      at most 8 notes totaling 1600 characters; preferred_style; and at most 3 style_hints.'
+    zh_Hans: 严格JSON对象：action=edit/select/reset/reset_preferences/preferences/help；asset_roles按上传顺序；selected_id为A/B或空；preference_notes最多8条共1600字；preferred_style；style_hints最多3项。
+  llm_description: 'Strict JSON object: action=edit/select/reset/reset_preferences/preferences/help;
+    asset_roles in upload order; selected_id=A/B or empty; preference_notes with at
+    most 8 notes totaling 1600 characters; preferred_style; and at most 3 style_hints.'
+- name: query
+  type: string
+  required: true
+  form: llm
+  label:
+    en_US: Query
+    zh_Hans: 用户当前原话
+  human_description:
+    en_US: Bind directly to sys.query to verify explicit preference-saving instructions
+      and retain current feedback. Preference opt-in currently recognizes Chinese
+      cues only.
+    zh_Hans: 直接绑定sys.query，用于确认长期偏好保存指令及保留本轮具体反馈。
+  llm_description: Bind directly to sys.query to verify explicit preference-saving
+    instructions and retain current feedback. Preference opt-in currently recognizes
+    Chinese cues only.
+output_schema:
+  type: object
+  properties:
+    status:
+      type: string
+      description: ready/control/error
+    summary:
+      type: string
+      description: Actual preparation result or error
+    context_json:
+      type: string
+      description: Preferences, relevant style cards, previous plan, current request,
+        and pending preview variants
+    selected_recipe_json:
+      type: string
+      description: Complete final plan for a direct A/B selection; empty otherwise
+    source_sha256:
+      type: string
+      description: SHA-256 of the original source file bytes
+    context_revision:
+      type: string
+      description: Session cache revision; empty if caching failed
+    continuity:
+      type: string
+      description: yes means the current context was saved; no means assets need to
+        be uploaded again
+    has_source:
+      type: number
+      description: 'Whether an original is available: 0/1'
+    has_reference:
+      type: number
+      description: 'Whether a separate style reference is available: 0/1'
+    has_mask:
+      type: number
+      description: 'Whether a mask is available: 0/1'
+    has_background:
+      type: number
+      description: 'Whether a replacement background is available: 0/1'
+extra:
+  python:
+    source: tools/prepare.py

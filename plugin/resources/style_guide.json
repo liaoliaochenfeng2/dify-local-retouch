@@ -1,0 +1,1629 @@
+{
+  "schema_version": "2.0",
+  "resource_type": "curated_offline_style_interpretation_guide",
+  "language": "en-US",
+  "provenance": {
+    "source": "Manually authored style interpretation guidance and regression expectations for this project.",
+    "network_used": false,
+    "claims_user_approval": false,
+    "claims_online_model_evaluation": false,
+    "note": "Not scraped trends, training data, approved aesthetic examples or model predictions. Cases are manually authored expected behaviors."
+  },
+  "runtime_injection": {
+    "include": [
+      "control_policy",
+      "phrase_families",
+      "relevant_style_cards",
+      "few_shots",
+      "provided_session_preferences"
+    ],
+    "exclude": [
+      "cases"
+    ],
+    "note": "Choose relevant style cards from the actual source image and request; do not inject the complete test set on every run. The current tool schema defines executable capabilities.",
+    "planner_contract": {
+      "action": "apply|clarify",
+      "plan": {
+        "mode": "final|preview",
+        "explanation": "string",
+        "variants": [
+          {
+            "id": "A|B",
+            "label": "string",
+            "recipe": {
+              "version": 2,
+              "operations": "array"
+            }
+          }
+        ]
+      },
+      "reply": "string"
+    },
+    "state_contract": {
+      "style_hints": "Up to three of the eight stable style IDs, supplied by the preceding intent step.",
+      "selected_id": "A or B. A bare selection directly uses the saved candidate recipe rather than replanning it.",
+      "last_recipe": "Modify this complete recipe for ordinary feedback, then render again from the original.",
+      "preference_notes": "Persist only with explicit supported Chinese opt-in wording; at most eight notes and 1600 characters total.",
+      "preferred_style": "A direction explicitly accepted for future use. Ordinary feedback affects only the current conversation."
+    }
+  },
+  "control_policy": [
+    "Interpret the complete sentence before separating direction, target region, strength, preservation rules, prohibitions and feedback scope. Negation and constraints such as only, still, keep and but take precedence over style keywords.",
+    "Style cards are composable interpretation aids, not one-to-one keyword mappings. Translate unfamiliar metaphors into light, color, tonal separation and texture goals first.",
+    "Adapt to exposure, day or night, lighting, subject size, existing casts and noise. Identical wording does not imply identical parameters.",
+    "Do not change facial features, body shape, identity cues, pose, clothing, composition or bystanders unless specifically requested. Do not infer whitening, slimming or leg-length preferences from gender.",
+    "Use two different restrained previews only when a first style request is materially ambiguous and neither an accepted preference nor a reference resolves it. Otherwise prefer one result.",
+    "Resolve selected_id against the candidates actually supplied for this conversation. If unavailable, explain the missing state rather than inventing history. Change only requested dimensions after selection.",
+    "For targeted feedback, revise the accepted complete recipe instead of layering full presets repeatedly. Undo unwanted removal or deformation by replaying the original with a corrected recipe.",
+    "Precise masks and protect_mask constraints take priority over automatic style. protect_skin is only a color heuristic that reduces changes, not precise portrait segmentation or exact color preservation.",
+    "Map aesthetic goals to supported operations. Explain unsupported clothing changes, pose changes and complex missing-content reconstruction; do not substitute color changes or smearing and claim success.",
+    "Do not claim model training, permanent learning, zero artificial appearance, guaranteed identity preservation or unchanged pixels. Describe actual edits and visible limitations.",
+    "When a sentence both selects A/B and asks for reduced strength or a color correction, use that candidate as the baseline and honor the additional feedback. Only a bare selection directly delivers the saved recipe."
+  ],
+  "reference_policy": {
+    "allowed": [
+      "Borrow warmth, color relationships and broad tonal tendencies.",
+      "Account for source exposure and day/night context before a restrained transfer.",
+      "Preserve composition and subject structure when only color is requested."
+    ],
+    "forbidden": [
+      "Copying reference people, facial features, clothing or poses.",
+      "Automatically treating the reference as a replacement background.",
+      "Describing Lab statistical color matching as reproduction of photographic lighting."
+    ],
+    "engine_note": "reference_match performs limited color-statistics matching. It cannot recreate spatial lighting or local color distributions. Preserve luminance by default and match contrast cautiously."
+  },
+  "preference_policy": {
+    "source_priority": [
+      "Explicit current instructions and prohibitions.",
+      "Selected candidate plus current feedback.",
+      "Explicitly saved preferences actually present in the supplied state.",
+      "Restrained defaults from relevant style cards."
+    ],
+    "store_only_explicit": [
+      "Accepted candidate direction.",
+      "Explicitly accepted or rejected adjustment strength.",
+      "Explicit skin-tone, texture and preservation requirements."
+    ],
+    "do_not_infer": [
+      "Aesthetic preferences from gender.",
+      "Approval from silence.",
+      "Preferences from unavailable prior conversations."
+    ],
+    "scope_note": "Use only state actually provided by the workflow. Do not pretend to remember unavailable information."
+  },
+  "phrase_families": [
+    {
+      "label": "Social-photo aesthetic",
+      "meaning": "A broad aesthetic request, not a single filter.",
+      "interpretation": "Use scene, modifiers, references and accepted preferences to choose a direction; show two restrained directions if significant initial ambiguity remains.",
+      "must_not": "Do not force one style ID or assume whitening, smoothing or slimming.",
+      "label_zh_Hans": "小红书感"
+    },
+    {
+      "label": "Refined or textured",
+      "meaning": "Infer the desired color restraint, tonal separation and material texture.",
+      "interpretation": "Keep the subject appropriately bright and detailed while organizing color and tone.",
+      "must_not": "Do not automatically darken, turn gray/cool, add black-and-gold tones or sharpen.",
+      "label_zh_Hans": "高级感／质感"
+    },
+    {
+      "label": "Natural-looking and recognizable",
+      "meaning": "A cross-style constraint: modest improvement while keeping personal features.",
+      "interpretation": "Limit strength; retain skin texture, facial features and body shape unless explicitly asked otherwise.",
+      "must_not": "Do not map it to a fixed skin tone or promise unchanged identity and pixels.",
+      "label_zh_Hans": "妈生感／别假／别换脸"
+    },
+    {
+      "label": "Atmospheric or cinematic",
+      "meaning": "Emphasize the source scene lighting, tonal relationships and color.",
+      "interpretation": "Identify day/night, main light and subject before choosing a direction; retain requested crowds and context.",
+      "must_not": "Do not add black bars, change weather, invent lighting or erase the scene automatically.",
+      "label_zh_Hans": "氛围感／电影感"
+    },
+    {
+      "label": "Cool, light skin tone",
+      "meaning": "May combine less warmth with mild skin brightening; face and neck must remain coordinated.",
+      "interpretation": "Separate warmth and lightness goals, use restrained local changes, and avoid further cooling an already cool source.",
+      "must_not": "Do not turn the full image blue, bleach the skin, create a gray face or edit only the face.",
+      "label_zh_Hans": "冷白皮"
+    },
+    {
+      "label": "Soft, refined skin texture",
+      "meaning": "Soft tonal transitions and modest smoothing with real texture preserved.",
+      "interpretation": "Identify the skin region, avoid eyes/lips/hair and keep local smoothing restrained.",
+      "must_not": "Do not heavily smooth the whole face, erase all texture or redraw facial features.",
+      "label_zh_Hans": "奶油肌／皮肤细腻"
+    },
+    {
+      "label": "Film, retro or Hong Kong-inspired",
+      "meaning": "These can imply different tone, black-point and color goals; they are not one warm-yellow filter.",
+      "interpretation": "Use source conditions and negative constraints to decide highlight softness, color restraint and tonal structure.",
+      "must_not": "Do not automatically add grain, scratches, light leaks, orange/yellow casts or oversaturated red.",
+      "label_zh_Hans": "胶片／复古／港风"
+    },
+    {
+      "label": "Clear, clean or less hazy",
+      "meaning": "Usually a tonal/color goal; object removal requires its own explicit request.",
+      "interpretation": "Improve tone and casts first; erase objects only when a specific removal target is given.",
+      "must_not": "Do not interpret clean as removing strangers, flattening the ground or cutting out the background.",
+      "label_zh_Hans": "去灰／干净／通透"
+    }
+  ],
+  "style_cards": [
+    {
+      "id": "clean_natural",
+      "name": "Clean natural",
+      "goal": "Improve clarity and lightness while retaining real skin tones and the scene texture.",
+      "visual_dimensions": {
+        "light": "Keep the subject moderately bright with highlight gradation.",
+        "contrast": "Clear midtones without gray haze or harsh edges.",
+        "color": "Reduce unwanted casts before modest saturation changes.",
+        "texture": "Retain real skin, clothing and ground texture."
+      },
+      "adapt_to_source": [
+        "For a dark source, prioritize the subject or shadows rather than lifting everything.",
+        "For an already bright source, organize color and tone rather than adding exposure.",
+        "Local clarity in night scenes must preserve the night."
+      ],
+      "suitable_scenes": [
+        "Everyday portraits",
+        "Natural-light snapshots",
+        "Light travel edits"
+      ],
+      "avoid": [
+        "Bleached skin",
+        "Clipped white walls or sky",
+        "Erasing environmental texture"
+      ],
+      "preserve": [
+        "Facial features and body shape",
+        "Natural skin-tone variation",
+        "Meaningful scene elements"
+      ],
+      "counterexample": {
+        "interpretation": "Improve color and distractions while preserving normal wear and fine texture; do not erase every mark by default.",
+        "utterance_zh_Hans": "干净一点但地面不要假",
+        "utterance": "干净一点但地面不要假"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "清透自然",
+      "example_expressions_zh_Hans": [
+        "清透一点",
+        "干净但自然",
+        "像原相机状态更好"
+      ],
+      "example_expressions": [
+        "Clean natural",
+        "Improve clarity and lightness while retaining real skin tones and the scene texture."
+      ]
+    },
+    {
+      "id": "warm_soft",
+      "name": "Warm soft",
+      "goal": "Create restrained warmth and softness while keeping skin and environment distinguishable.",
+      "visual_dimensions": {
+        "light": "Soft brightness without excessive shadow lifting.",
+        "contrast": "Moderately reduce harsh tonal contrast.",
+        "color": "The environment may be slightly warm; avoid yellow/red skin casts.",
+        "texture": "Softness does not mean blur or heavy smoothing."
+      },
+      "adapt_to_source": [
+        "Correct an already yellow indoor source before deciding how much warmth to retain.",
+        "Preserve backlit highlights and outlines rather than adding a white veil.",
+        "Treat subject and background separately when the reference is warm but yellow skin is unwanted."
+      ],
+      "suitable_scenes": [
+        "Indoor snapshots",
+        "Cafes",
+        "Sunset or warm-light portraits"
+      ],
+      "avoid": [
+        "Orange/yellow over the whole image",
+        "Red/yellow skin clipping",
+        "Unconditional detail loss"
+      ],
+      "preserve": [
+        "Eye and lip edges",
+        "Actual light source",
+        "Original main garment color"
+      ],
+      "counterexample": {
+        "interpretation": "Pair soft tonal transitions with light local smoothing and retain texture rather than plastic-looking skin.",
+        "utterance_zh_Hans": "奶油肌但近看还有皮肤纹理",
+        "utterance": "奶油肌但近看还有皮肤纹理"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "暖调柔和",
+      "example_expressions_zh_Hans": [
+        "温柔一点",
+        "奶油感",
+        "暖暖的氛围"
+      ],
+      "example_expressions": [
+        "Warm soft",
+        "Create restrained warmth and softness while keeping skin and environment distinguishable."
+      ]
+    },
+    {
+      "id": "cool_editorial",
+      "name": "Cool editorial",
+      "goal": "Use restrained color and clear tonal structure while keeping the subject lively.",
+      "visual_dimensions": {
+        "light": "Keep subject exposure appropriate and scene shadows plausible.",
+        "contrast": "Tonal structure without crushed blacks.",
+        "color": "A slightly cool environment with no cyan/gray skin cast.",
+        "texture": "Retain material texture without excessive sharpening."
+      },
+      "adapt_to_source": [
+        "Check existing blue/cyan casts before cooling a cool-light photo further.",
+        "Do not darken an underexposed subject merely to create a cool look.",
+        "Choose a neutral direction if refined is requested but cool color is rejected."
+      ],
+      "suitable_scenes": [
+        "Urban portraits",
+        "Simple interiors",
+        "Photos with distinct clothing or building textures"
+      ],
+      "avoid": [
+        "Equating refined with dark/cool gray",
+        "Gray-white skin",
+        "Fully crushed shadows"
+      ],
+      "preserve": [
+        "Subject brightness",
+        "Natural skin color",
+        "Black/white clothing detail"
+      ],
+      "counterexample": {
+        "interpretation": "Organize color and tonal separation while retaining subject brightness; do not automatically darken the whole image.",
+        "utterance_zh_Hans": "高级一点，别黑乎乎",
+        "utterance": "高级一点，别黑乎乎"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "冷调质感",
+      "example_expressions_zh_Hans": [
+        "冷调质感",
+        "杂志感但自然",
+        "克制一点"
+      ],
+      "example_expressions": [
+        "Cool editorial",
+        "Use restrained color and clear tonal structure while keeping the subject lively."
+      ]
+    },
+    {
+      "id": "film_matte",
+      "name": "Matte film",
+      "goal": "Soften tonal transitions and color moderately while retaining recognizable detail.",
+      "visual_dimensions": {
+        "light": "Soft highlights without invented glow.",
+        "contrast": "A small black-point lift may retain midtone structure.",
+        "color": "Restrained color without a dirty gray overlay.",
+        "texture": "No automatic grain, noise, scratches or defocus."
+      },
+      "adapt_to_source": [
+        "Restore structure before lifting blacks in an already hazy source.",
+        "Do not add grain to a noisy night photo.",
+        "A film request alone does not imply artificial aging marks."
+      ],
+      "suitable_scenes": [
+        "Everyday memories",
+        "Soft-light travel photos",
+        "Subtle retro portraits"
+      ],
+      "avoid": [
+        "Equating film with dirty gray",
+        "Unconditional loss of contrast and sharpness",
+        "Artificial grain or light leaks"
+      ],
+      "preserve": [
+        "Eye and hair detail",
+        "Readable shadows",
+        "Original time and scene context"
+      ],
+      "counterexample": {
+        "interpretation": "Prioritize soft highlights and restrained color; any black-point lift must preserve clear tonal structure.",
+        "utterance_zh_Hans": "胶片一点但别灰蒙蒙",
+        "utterance": "胶片一点但别灰蒙蒙"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "柔和胶片",
+      "example_expressions_zh_Hans": [
+        "胶片感",
+        "柔和复古",
+        "别太数码味"
+      ],
+      "example_expressions": [
+        "Matte film",
+        "Soften tonal transitions and color moderately while retaining recognizable detail."
+      ]
+    },
+    {
+      "id": "retro_warm",
+      "name": "Warm retro",
+      "goal": "Use defined tonal structure and warm color while preserving believable skin and garment relationships.",
+      "visual_dimensions": {
+        "light": "Clear subject tone without uniform darkening.",
+        "contrast": "Slightly stronger structure without hard edges.",
+        "color": "Controlled warmth and accent colors rather than red/yellow everywhere.",
+        "texture": "Real skin and fabric texture."
+      },
+      "adapt_to_source": [
+        "Protect already vivid red clothing or lips instead of globally adding saturation.",
+        "Correct a strong yellow skin cast first.",
+        "Retain retro tonal structure with neutral color when warmth is unwanted."
+      ],
+      "suitable_scenes": [
+        "Retro clothing",
+        "Street portraits",
+        "Scenes with intentional warm light"
+      ],
+      "avoid": [
+        "Equating Hong Kong-inspired with an orange filter",
+        "Red clipping across the image",
+        "Automatic makeup changes"
+      ],
+      "preserve": [
+        "Personal features",
+        "Garment colors",
+        "Natural separation between lip and skin colors"
+      ],
+      "counterexample": {
+        "interpretation": "Retain defined structure and measured color while avoiding global yellow/red additions.",
+        "utterance_zh_Hans": "港风但不要发黄，也别把嘴唇衣服都变红",
+        "utterance": "港风但不要发黄，也别把嘴唇衣服都变红"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "复古暖色",
+      "example_expressions_zh_Hans": [
+        "港风一点",
+        "复古暖调",
+        "有一点老照片气质"
+      ],
+      "example_expressions": [
+        "Warm retro",
+        "Use defined tonal structure and warm color while preserving believable skin and garment relationships."
+      ]
+    },
+    {
+      "id": "night_atmosphere",
+      "name": "Night atmosphere",
+      "goal": "Keep the night, lights and live scene while making the subject clearer in that environment.",
+      "visual_dimensions": {
+        "light": "Improve subject tone locally and protect bright signs.",
+        "contrast": "Night scenes keep shadows; avoid global gray haze.",
+        "color": "Retain intentional stage/neon colors while gently handling unwanted skin casts.",
+        "texture": "Retain crowds and scene information; do not sharpen noise into detail."
+      },
+      "adapt_to_source": [
+        "Lift an underexposed subject locally rather than turning night into daylight.",
+        "Colored stage light may be intentional atmosphere; do not neutralize all of it.",
+        "Consider small crowd edits only for explicit, identified targets."
+      ],
+      "suitable_scenes": [
+        "Concerts",
+        "Night street portraits",
+        "Neon or illuminated events"
+      ],
+      "avoid": [
+        "Brightening the entire frame",
+        "Clipped unreadable signs",
+        "Default crowd removal",
+        "Extreme denoising or sharpening"
+      ],
+      "preserve": [
+        "Night appearance",
+        "Light direction and color",
+        "Requested crowd density"
+      ],
+      "counterexample": {
+        "interpretation": "Improve subject and tonal separation while retaining the crowd and stage light; no automatic large-area person removal.",
+        "utterance_zh_Hans": "去灰干净点，但要保留演唱会人很多的感觉",
+        "utterance": "去灰干净点，但要保留演唱会人很多的感觉"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "夜景氛围",
+      "example_expressions_zh_Hans": [
+        "演唱会大片感",
+        "夜景氛围",
+        "人亮一点但还是晚上"
+      ],
+      "example_expressions": [
+        "Night atmosphere",
+        "Keep the night, lights and live scene while making the subject clearer in that environment."
+      ]
+    },
+    {
+      "id": "travel_fresh",
+      "name": "Fresh travel",
+      "goal": "Clarify lively environmental color while keeping natural skin and truthful location information.",
+      "visual_dimensions": {
+        "light": "Balance subject and environment, protecting sky highlights.",
+        "contrast": "Moderate clarity without brittle sharpening.",
+        "color": "Fresh sky/foliage without forced saturated blue/green.",
+        "texture": "Retain rock, building and ground detail."
+      },
+      "adapt_to_source": [
+        "Do not intensify an already vivid blue sky; reduce fluorescent greens first.",
+        "An overcast scene can look fresh without inventing sunny light.",
+        "Do not guess tiny facial retouch regions for a small distant subject."
+      ],
+      "suitable_scenes": [
+        "Travel memories",
+        "Outdoor portraits",
+        "Coastal or mountain scenes"
+      ],
+      "avoid": [
+        "Fluorescent green or electric-blue sky",
+        "Invented sunny weather",
+        "Removing every tourist by default"
+      ],
+      "preserve": [
+        "Original weather",
+        "Location features",
+        "Skin tone and real proportions"
+      ],
+      "counterexample": {
+        "interpretation": "Use clear color, subtle coolness or natural structure rather than excessive saturation or exposure.",
+        "utterance_zh_Hans": "清爽但不要糖水片",
+        "utterance": "清爽但不要糖水片"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "旅行清新",
+      "example_expressions_zh_Hans": [
+        "旅行博主那种清爽感",
+        "蓝天绿树自然点",
+        "像雨后薄荷汽水"
+      ],
+      "example_expressions": [
+        "Fresh travel",
+        "Clarify lively environmental color while keeping natural skin and truthful location information."
+      ]
+    },
+    {
+      "id": "portrait_neutral",
+      "name": "Neutral portrait",
+      "goal": "Make modest, explainable improvements focused on the person, skin tone and texture.",
+      "visual_dimensions": {
+        "light": "Coordinate face, neck and other visible skin brightness.",
+        "contrast": "Retain facial depth.",
+        "color": "Natural neutral color with requested red/yellow cast reductions.",
+        "texture": "Retain skin texture, facial edges and identifying features."
+      },
+      "adapt_to_source": [
+        "Natural-looking requests prioritize existing features and body shape, not automatic face slimming or enlarged eyes.",
+        "Separate cool/light skin requests into color and brightness goals; avoid gray skin or face/neck mismatch.",
+        "Use low-strength local processing on identified areas rather than treating all skin texture as a flaw."
+      ],
+      "suitable_scenes": [
+        "Everyday portraits",
+        "Natural document-style portraits",
+        "Light edits without a strong color direction"
+      ],
+      "avoid": [
+        "Automatic whitening, face slimming or leg lengthening",
+        "Smoothing the whole face",
+        "Ignoring neck color while editing only the face"
+      ],
+      "preserve": [
+        "Personal features",
+        "Facial features and body shape",
+        "Reasonable skin texture and tone variation"
+      ],
+      "counterexample": {
+        "interpretation": "Observe lighting and specific issues first and default to a light natural edit; do not infer whitening or reshaping preferences from gender.",
+        "utterance_zh_Hans": "女生照片帮忙修好看一点",
+        "utterance": "女生照片帮忙修好看一点"
+      },
+      "starting_strength": {
+        "range": [
+          0.25,
+          0.45
+        ],
+        "meaning": "A restrained starting range only; adapt to the source, requested strength and accepted preferences."
+      },
+      "evidence_status": "Manually authored initial guidance, not approved user cases or a guarantee of aesthetic quality.",
+      "name_zh_Hans": "中性人像",
+      "example_expressions_zh_Hans": [
+        "妈生感",
+        "像我但状态更好",
+        "自然精修",
+        "冷白皮但别假"
+      ],
+      "example_expressions": [
+        "Neutral portrait",
+        "Make modest, explainable improvements focused on the person, skin tone and texture."
+      ]
+    }
+  ],
+  "few_shots": [
+    {
+      "input": "A social-photo look, but natural; keep me looking like myself.",
+      "context": "First request, no reference, natural-light portrait.",
+      "interpretation": "The style request is broad; natural appearance and personal features are explicit constraints.",
+      "decision": "Choose two restrained directions suited to the source, such as clean natural and warm soft, replacing the warm option if the source is already too warm. Do not reshape face or body automatically.",
+      "input_zh_Hans": "小红书风格，但自然一点，别变网红脸。"
+    },
+    {
+      "input": "Reduce haze and refine skin, but keep the crowded concert atmosphere.",
+      "context": "Night scene with colored stage light and audience.",
+      "interpretation": "Improve subject and tone while preserving night, crowd and real light.",
+      "decision": "Use the night direction with gentle skin-color handling; do not remove the crowd.",
+      "input_zh_Hans": "去灰，皮肤高级一点，但要保留演唱会人多的感觉。"
+    },
+    {
+      "input": "Borrow this photo's colors without changing my composition.",
+      "context": "A separate reference image is available.",
+      "interpretation": "Color only; preserve source content and composition.",
+      "decision": "Use low-strength color-statistics matching suited to source exposure; do not copy reference people or layout.",
+      "input_zh_Hans": "参考这张的颜色，别改我的构图。"
+    },
+    {
+      "input": "Use B, and only reduce the redness in my skin a little.",
+      "context": "The selected ID resolves to an available saved B recipe.",
+      "interpretation": "The direction is chosen; current feedback targets skin redness only.",
+      "decision": "Revise a single complete recipe; do not repeat a preset, generate another pair or desaturate the whole image.",
+      "input_zh_Hans": "就B，只把肤色红色再退一点。"
+    },
+    {
+      "input": "A Hong Kong-inspired retro look, but no yellow cast.",
+      "context": "The source is already yellow.",
+      "interpretation": "Retro tonal structure is acceptable; the yellow direction is explicitly rejected.",
+      "decision": "Gently correct the cast, then preserve measured structure and accent colors without globally adding warmth.",
+      "input_zh_Hans": "港风一点，但是不要黄。"
+    },
+    {
+      "input": "Reconstruct the entire building hidden behind those people.",
+      "context": "A large area of the building is occluded.",
+      "interpretation": "This requires missing-content reconstruction beyond small-area classical inpainting.",
+      "decision": "Explain the limitation; do not smear the area and claim the building was restored.",
+      "input_zh_Hans": "把挡住的建筑完整补出来，像没人在那儿一样。"
+    }
+  ],
+  "case_evaluation": {
+    "purpose": "Chinese semantic and combined-constraint regression expectations.",
+    "execution_status": "not_run_against_host_models",
+    "passing_rule": "Satisfy expected intent and preview policy without forbidden behavior. Several source-appropriate parameter choices may pass; no unique style ID is required.",
+    "image_dependency": "Regions, parameters and visual quality that depend on a source photograph cannot be passed using text-only evaluation."
+  },
+  "cases": [
+    {
+      "id": "ZH01",
+      "expected": {
+        "intent_tags": [
+          "infer_from_scene",
+          "low_strength",
+          "preserve_identity"
+        ],
+        "preview_policy": "two_if_materially_ambiguous",
+        "acceptable_style_ids": [
+          "clean_natural",
+          "portrait_neutral",
+          "warm_soft"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "scene": "自然光日常人像",
+        "selected_id": null,
+        "reference_present": false
+      },
+      "utterance_zh_Hans": "想要小红书风格，其他你看着弄。",
+      "forbidden_zh_Hans": [
+        "默认美白瘦脸拉腿",
+        "固定唯一风格",
+        "宣称精确理解未表达偏好"
+      ],
+      "utterance": "想要小红书风格，其他你看着弄。",
+      "forbidden": [
+        "默认美白瘦脸拉腿",
+        "固定唯一风格",
+        "宣称精确理解未表达偏好"
+      ]
+    },
+    {
+      "id": "ZH02",
+      "expected": {
+        "intent_tags": [
+          "preserve_night",
+          "preserve_stage_light",
+          "infer_style_from_scene"
+        ],
+        "preview_policy": "two_if_materially_ambiguous",
+        "acceptable_style_ids": [
+          "night_atmosphere"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "scene": "夜间演唱会",
+        "selected_id": null
+      },
+      "utterance_zh_Hans": "这张演唱会照片弄成小红书氛围感。",
+      "forbidden_zh_Hans": [
+        "改成白天",
+        "清除全部观众",
+        "默认纯暖滤镜"
+      ],
+      "utterance": "这张演唱会照片弄成小红书氛围感。",
+      "forbidden": [
+        "改成白天",
+        "清除全部观众",
+        "默认纯暖滤镜"
+      ]
+    },
+    {
+      "id": "ZH03",
+      "expected": {
+        "intent_tags": [
+          "use_reference_color_only",
+          "preserve_identity",
+          "reference_bounds"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "reference_present": true
+      },
+      "utterance_zh_Hans": "就按参考图的清透感觉来，脸还是我自己的。",
+      "forbidden_zh_Hans": [
+        "复制参考人物",
+        "换脸",
+        "照搬全部亮度参数"
+      ],
+      "utterance": "就按参考图的清透感觉来，脸还是我自己的。",
+      "forbidden": [
+        "复制参考人物",
+        "换脸",
+        "照搬全部亮度参数"
+      ]
+    },
+    {
+      "id": "ZH04",
+      "expected": {
+        "intent_tags": [
+          "improve_tonal_separation",
+          "preserve_subject_brightness",
+          "respect_negative"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral",
+          "clean_natural",
+          "cool_editorial"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "高级一点，但别给我修得黑乎乎的。",
+      "forbidden_zh_Hans": [
+        "全图压暗",
+        "固定冷灰"
+      ],
+      "utterance": "高级一点，但别给我修得黑乎乎的。",
+      "forbidden": [
+        "全图压暗",
+        "固定冷灰"
+      ]
+    },
+    {
+      "id": "ZH05",
+      "expected": {
+        "intent_tags": [
+          "resolve_combined_style",
+          "warm_or_neutral",
+          "respect_negative"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "warm_soft",
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "高级感，但不喜欢冷色，想温柔一点。",
+      "forbidden_zh_Hans": [
+        "使用明显冷调",
+        "高级锁定cool_editorial"
+      ],
+      "utterance": "高级感，但不喜欢冷色，想温柔一点。",
+      "forbidden": [
+        "使用明显冷调",
+        "高级锁定cool_editorial"
+      ]
+    },
+    {
+      "id": "ZH06",
+      "expected": {
+        "intent_tags": [
+          "low_strength",
+          "preserve_features",
+          "preserve_skin_texture"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral",
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "像原相机拍出来状态很好那种，妈生感。",
+      "forbidden_zh_Hans": [
+        "瘦脸大眼",
+        "自动美白",
+        "重绘五官"
+      ],
+      "utterance": "像原相机拍出来状态很好那种，妈生感。",
+      "forbidden": [
+        "瘦脸大眼",
+        "自动美白",
+        "重绘五官"
+      ]
+    },
+    {
+      "id": "ZH07",
+      "expected": {
+        "intent_tags": [
+          "mild_skin_tone_adjustment",
+          "coordinate_face_neck",
+          "protect_skin_texture"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral",
+          "cool_editorial"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "想要冷白皮，但脸和脖子别两个颜色。",
+      "forbidden_zh_Hans": [
+        "脸部单独漂白",
+        "全图变蓝",
+        "灰白肤色"
+      ],
+      "utterance": "想要冷白皮，但脸和脖子别两个颜色。",
+      "forbidden": [
+        "脸部单独漂白",
+        "全图变蓝",
+        "灰白肤色"
+      ]
+    },
+    {
+      "id": "ZH08",
+      "expected": {
+        "intent_tags": [
+          "soft_light",
+          "local_light_smoothing",
+          "preserve_skin_texture"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "warm_soft",
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "奶油肌，近看还要有皮肤纹理。",
+      "forbidden_zh_Hans": [
+        "全脸重磨皮",
+        "删除毛孔与五官边缘"
+      ],
+      "utterance": "奶油肌，近看还要有皮肤纹理。",
+      "forbidden": [
+        "全脸重磨皮",
+        "删除毛孔与五官边缘"
+      ]
+    },
+    {
+      "id": "ZH09",
+      "expected": {
+        "intent_tags": [
+          "improve_tonal_separation",
+          "preserve_crowd",
+          "preserve_night"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "night_atmosphere"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "去灰干净一点，但演唱会人很多的感觉得保留。",
+      "forbidden_zh_Hans": [
+        "删除人群",
+        "全图过度提亮",
+        "把去灰当去人"
+      ],
+      "utterance": "去灰干净一点，但演唱会人很多的感觉得保留。",
+      "forbidden": [
+        "删除人群",
+        "全图过度提亮",
+        "把去灰当去人"
+      ]
+    },
+    {
+      "id": "ZH10",
+      "expected": {
+        "intent_tags": [
+          "small_target_cleanup",
+          "preserve_environment_texture",
+          "low_strength"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "地面可以修一下，但不要干净得像刚铺的一样。",
+      "forbidden_zh_Hans": [
+        "抹除所有磨损",
+        "大面积平滑地面",
+        "重建地砖"
+      ],
+      "utterance": "地面可以修一下，但不要干净得像刚铺的一样。",
+      "forbidden": [
+        "抹除所有磨损",
+        "大面积平滑地面",
+        "重建地砖"
+      ]
+    },
+    {
+      "id": "ZH11",
+      "expected": {
+        "intent_tags": [
+          "reference_color_only",
+          "preserve_composition",
+          "preserve_identity"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "reference_present": true
+      },
+      "utterance_zh_Hans": "参考图只借它的色调，构图和我的脸都不要动。",
+      "forbidden_zh_Hans": [
+        "移植人物",
+        "移动主体",
+        "改姿态"
+      ],
+      "utterance": "参考图只借它的色调，构图和我的脸都不要动。",
+      "forbidden": [
+        "移植人物",
+        "移动主体",
+        "改姿态"
+      ]
+    },
+    {
+      "id": "ZH12",
+      "expected": {
+        "intent_tags": [
+          "targeted_feedback",
+          "skin_red_cast_reduction",
+          "preserve_accepted_baseline"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "selected_id": "B",
+        "accepted_baseline_available": true,
+        "feedback_scope": "skin_only"
+      },
+      "utterance_zh_Hans": "上一张挺好，只把皮肤的红色退一点，其他保持。",
+      "forbidden_zh_Hans": [
+        "全图降饱和",
+        "重套全套风格",
+        "重复叠加旧步骤"
+      ],
+      "utterance": "上一张挺好，只把皮肤的红色退一点，其他保持。",
+      "forbidden": [
+        "全图降饱和",
+        "重套全套风格",
+        "重复叠加旧步骤"
+      ]
+    },
+    {
+      "id": "ZH13",
+      "expected": {
+        "intent_tags": [
+          "resolve_selected_candidate",
+          "reduce_selected_strength",
+          "single_result"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "selected_id": "B",
+        "candidate_map": {
+          "A": "clean_natural",
+          "B": "warm_soft"
+        }
+      },
+      "utterance_zh_Hans": "就B，稍微淡一点。",
+      "forbidden_zh_Hans": [
+        "重新给两套小样",
+        "忽略已选方案",
+        "猜测B对应风格"
+      ],
+      "utterance": "就B，稍微淡一点。",
+      "forbidden": [
+        "重新给两套小样",
+        "忽略已选方案",
+        "猜测B对应风格"
+      ]
+    },
+    {
+      "id": "ZH14",
+      "expected": {
+        "intent_tags": [
+          "invalid_selection_requires_resolution"
+        ],
+        "preview_policy": "clarify"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "selected_id": "C",
+        "candidate_map": {
+          "A": "clean_natural",
+          "B": "warm_soft"
+        }
+      },
+      "utterance_zh_Hans": "选C，就这个。",
+      "forbidden_zh_Hans": [
+        "假装存在C",
+        "任意选择一个旧方案"
+      ],
+      "utterance": "选C，就这个。",
+      "forbidden": [
+        "假装存在C",
+        "任意选择一个旧方案"
+      ]
+    },
+    {
+      "id": "ZH15",
+      "expected": {
+        "intent_tags": [
+          "retro_tonal_structure",
+          "avoid_yellow_cast",
+          "protect_red_colors"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "retro_warm",
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "港风一点，但不要发黄，也别把嘴唇和衣服修得都很红。",
+      "forbidden_zh_Hans": [
+        "全图加黄",
+        "全图加红",
+        "妆容重绘"
+      ],
+      "utterance": "港风一点，但不要发黄，也别把嘴唇和衣服修得都很红。",
+      "forbidden": [
+        "全图加黄",
+        "全图加红",
+        "妆容重绘"
+      ]
+    },
+    {
+      "id": "ZH16",
+      "expected": {
+        "intent_tags": [
+          "film_tonal_transition",
+          "preserve_midtone_structure",
+          "respect_negative"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "film_matte"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "胶片感，但别灰蒙蒙，也不要加噪点。",
+      "forbidden_zh_Hans": [
+        "过度抬黑位",
+        "添加颗粒",
+        "降低全部清晰度"
+      ],
+      "utterance": "胶片感，但别灰蒙蒙，也不要加噪点。",
+      "forbidden": [
+        "过度抬黑位",
+        "添加颗粒",
+        "降低全部清晰度"
+      ]
+    },
+    {
+      "id": "ZH17",
+      "expected": {
+        "intent_tags": [
+          "local_subject_lift",
+          "preserve_night",
+          "protect_highlights"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "night_atmosphere"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "人亮一点，夜景还得像夜景，灯牌不能白成一块。",
+      "forbidden_zh_Hans": [
+        "全局大幅曝光提升",
+        "抹掉灯牌细节"
+      ],
+      "utterance": "人亮一点，夜景还得像夜景，灯牌不能白成一块。",
+      "forbidden": [
+        "全局大幅曝光提升",
+        "抹掉灯牌细节"
+      ]
+    },
+    {
+      "id": "ZH18",
+      "expected": {
+        "intent_tags": [
+          "body_only_if_location_clear",
+          "preserve_face_shape",
+          "low_strength"
+        ],
+        "preview_policy": "clarify_if_target_unclear"
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "身材可以稍微修一点，但脸型绝对别动。",
+      "forbidden_zh_Hans": [
+        "自动瘦脸",
+        "全身统一拉伸",
+        "忽略部位不清"
+      ],
+      "utterance": "身材可以稍微修一点，但脸型绝对别动。",
+      "forbidden": [
+        "自动瘦脸",
+        "全身统一拉伸",
+        "忽略部位不清"
+      ]
+    },
+    {
+      "id": "ZH19",
+      "expected": {
+        "intent_tags": [
+          "skin_warm_cast_reduction",
+          "preserve_face_shape"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "不要瘦脸，只把脸上的黄光减一点。",
+      "forbidden_zh_Hans": [
+        "液化",
+        "全图明显冷却",
+        "自动美白"
+      ],
+      "utterance": "不要瘦脸，只把脸上的黄光减一点。",
+      "forbidden": [
+        "液化",
+        "全图明显冷却",
+        "自动美白"
+      ]
+    },
+    {
+      "id": "ZH20",
+      "expected": {
+        "intent_tags": [
+          "generalize_metaphor_to_dimensions",
+          "restrained_freshness",
+          "low_strength"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "travel_fresh",
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "像雨后薄荷汽水那种清爽感，不要糖水片。",
+      "forbidden_zh_Hans": [
+        "词库未命中即失败",
+        "强绿偏",
+        "过度饱和或过曝"
+      ],
+      "utterance": "像雨后薄荷汽水那种清爽感，不要糖水片。",
+      "forbidden": [
+        "词库未命中即失败",
+        "强绿偏",
+        "过度饱和或过曝"
+      ]
+    },
+    {
+      "id": "ZH21",
+      "expected": {
+        "intent_tags": [
+          "clear_midtone_structure",
+          "protect_highlights",
+          "preserve_texture"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "clean_natural",
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "要透一点，但别飘；有质感，别油亮。",
+      "forbidden_zh_Hans": [
+        "统一拉高曝光",
+        "制造皮肤高光",
+        "任意锁定风格卡"
+      ],
+      "utterance": "要透一点，但别飘；有质感，别油亮。",
+      "forbidden": [
+        "统一拉高曝光",
+        "制造皮肤高光",
+        "任意锁定风格卡"
+      ]
+    },
+    {
+      "id": "ZH22",
+      "expected": {
+        "intent_tags": [
+          "generalize_metaphor_to_dimensions",
+          "soft_warm_direction",
+          "preserve_material"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "warm_soft"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "像傍晚棉麻衣服那种柔软温暖的感觉。",
+      "forbidden_zh_Hans": [
+        "强黄滤镜",
+        "把衣服改成棉麻",
+        "模糊所有细节"
+      ],
+      "utterance": "像傍晚棉麻衣服那种柔软温暖的感觉。",
+      "forbidden": [
+        "强黄滤镜",
+        "把衣服改成棉麻",
+        "模糊所有细节"
+      ]
+    },
+    {
+      "id": "ZH23",
+      "expected": {
+        "intent_tags": [
+          "cool_environment_if_needed",
+          "protect_skin",
+          "protect_garment_color"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "cool_editorial"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "冷调，但皮肤别灰，衣服本来的颜色要留着。",
+      "forbidden_zh_Hans": [
+        "全图强冷色覆盖",
+        "灰白肤色",
+        "改变衣服主色"
+      ],
+      "utterance": "冷调，但皮肤别灰，衣服本来的颜色要留着。",
+      "forbidden": [
+        "全图强冷色覆盖",
+        "灰白肤色",
+        "改变衣服主色"
+      ]
+    },
+    {
+      "id": "ZH24",
+      "expected": {
+        "intent_tags": [
+          "fresh_environment",
+          "protect_sky_saturation",
+          "natural_skin"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "travel_fresh",
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "旅行照清新一点，天空别蓝得不真实。",
+      "forbidden_zh_Hans": [
+        "强蓝天空",
+        "荧光绿",
+        "换天空"
+      ],
+      "utterance": "旅行照清新一点，天空别蓝得不真实。",
+      "forbidden": [
+        "强蓝天空",
+        "荧光绿",
+        "换天空"
+      ]
+    },
+    {
+      "id": "ZH25",
+      "expected": {
+        "intent_tags": [
+          "observe_source_first",
+          "natural_light_retouch",
+          "avoid_gender_assumptions"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral",
+          "clean_natural"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "女生照片帮我修好看一点，自然就行。",
+      "forbidden_zh_Hans": [
+        "因性别自动美白瘦脸拉腿",
+        "过度磨皮"
+      ],
+      "utterance": "女生照片帮我修好看一点，自然就行。",
+      "forbidden": [
+        "因性别自动美白瘦脸拉腿",
+        "过度磨皮"
+      ]
+    },
+    {
+      "id": "ZH26",
+      "expected": {
+        "intent_tags": [
+          "target_specific_subject",
+          "local_only",
+          "preserve_others"
+        ],
+        "preview_policy": "single_or_clarify_target"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "scene": "group_portrait"
+      },
+      "utterance_zh_Hans": "只提亮左边那个人，其他人和背景都不要动。",
+      "forbidden_zh_Hans": [
+        "全局提亮",
+        "选错主体",
+        "所有人一起美化"
+      ],
+      "utterance": "只提亮左边那个人，其他人和背景都不要动。",
+      "forbidden": [
+        "全局提亮",
+        "选错主体",
+        "所有人一起美化"
+      ]
+    },
+    {
+      "id": "ZH27",
+      "expected": {
+        "intent_tags": [
+          "selective_smoothing",
+          "preserve_freckles",
+          "identity_constraints"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "portrait_neutral"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "皮肤细腻点，雀斑要留着，那是我的特点。",
+      "forbidden_zh_Hans": [
+        "擦除雀斑",
+        "统一磨平全部皮肤"
+      ],
+      "utterance": "皮肤细腻点，雀斑要留着，那是我的特点。",
+      "forbidden": [
+        "擦除雀斑",
+        "统一磨平全部皮肤"
+      ]
+    },
+    {
+      "id": "ZH28",
+      "expected": {
+        "intent_tags": [
+          "identify_unsupported_clothing_reconstruction",
+          "separate_feasible_style"
+        ],
+        "preview_policy": "clarify_scope"
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "把衣服换成白色连衣裙，再给我妈生感。",
+      "forbidden_zh_Hans": [
+        "把整体去色冒充换衣",
+        "声称生成连衣裙"
+      ],
+      "utterance": "把衣服换成白色连衣裙，再给我妈生感。",
+      "forbidden": [
+        "把整体去色冒充换衣",
+        "声称生成连衣裙"
+      ]
+    },
+    {
+      "id": "ZH29",
+      "expected": {
+        "intent_tags": [
+          "identify_large_complex_inpainting_limit"
+        ],
+        "preview_policy": "clarify_scope"
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "后面这几个人都去掉，露出他们挡住的建筑。",
+      "forbidden_zh_Hans": [
+        "邻域涂抹冒充真实建筑还原",
+        "未经说明只做调色"
+      ],
+      "utterance": "后面这几个人都去掉，露出他们挡住的建筑。",
+      "forbidden": [
+        "邻域涂抹冒充真实建筑还原",
+        "未经说明只做调色"
+      ]
+    },
+    {
+      "id": "ZH30",
+      "expected": {
+        "intent_tags": [
+          "specific_small_target_cleanup",
+          "preserve_moles",
+          "require_reliable_location"
+        ],
+        "preview_policy": "single_or_clarify_target"
+      },
+      "evaluation_status": "not_run",
+      "utterance_zh_Hans": "把脸上这颗临时的小痘修掉，痣不要动。",
+      "forbidden_zh_Hans": [
+        "整脸擦除",
+        "自动删除所有斑点"
+      ],
+      "utterance": "把脸上这颗临时的小痘修掉，痣不要动。",
+      "forbidden": [
+        "整脸擦除",
+        "自动删除所有斑点"
+      ]
+    },
+    {
+      "id": "ZH31",
+      "expected": {
+        "intent_tags": [
+          "targeted_feedback",
+          "reduce_warmth_only",
+          "preserve_exposure"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "selected_id": "B",
+        "accepted_baseline_available": true
+      },
+      "utterance_zh_Hans": "上一版太黄了，只减暖色，别把亮度也改了。",
+      "forbidden_zh_Hans": [
+        "从头套预设",
+        "更改亮度",
+        "重复完整处理链"
+      ],
+      "utterance": "上一版太黄了，只减暖色，别把亮度也改了。",
+      "forbidden": [
+        "从头套预设",
+        "更改亮度",
+        "重复完整处理链"
+      ]
+    },
+    {
+      "id": "ZH32",
+      "expected": {
+        "intent_tags": [
+          "compose_selected_dimensions",
+          "preserve_texture",
+          "avoid_repeat_smoothing"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "candidate_map": {
+          "A": "cool_editorial",
+          "B": "portrait_neutral"
+        },
+        "candidate_recipes_available": true
+      },
+      "utterance_zh_Hans": "A的颜色配B的明暗，人物别再磨皮。",
+      "forbidden_zh_Hans": [
+        "整套A再叠整套B",
+        "自动再磨皮",
+        "不存在基准时假装比较"
+      ],
+      "utterance": "A的颜色配B的明暗，人物别再磨皮。",
+      "forbidden": [
+        "整套A再叠整套B",
+        "自动再磨皮",
+        "不存在基准时假装比较"
+      ]
+    },
+    {
+      "id": "ZH33",
+      "expected": {
+        "intent_tags": [
+          "negative_feedback",
+          "update_session_preferences",
+          "fresh_neutral_direction"
+        ],
+        "preview_policy": "two_if_materially_ambiguous",
+        "acceptable_style_ids": [
+          "clean_natural",
+          "travel_fresh"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "candidate_map": {
+          "A": "film_matte",
+          "B": "warm_soft"
+        }
+      },
+      "utterance_zh_Hans": "两张都不太对，我想更清爽，不要这种灰黄。",
+      "forbidden_zh_Hans": [
+        "继续叠灰黄风格",
+        "宣称永久学习",
+        "不读取具体否定"
+      ],
+      "utterance": "两张都不太对，我想更清爽，不要这种灰黄。",
+      "forbidden": [
+        "继续叠灰黄风格",
+        "宣称永久学习",
+        "不读取具体否定"
+      ]
+    },
+    {
+      "id": "ZH34",
+      "expected": {
+        "intent_tags": [
+          "resolve_state_reference"
+        ],
+        "preview_policy": "clarify_if_state_missing"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "accepted_baseline_available": false,
+        "selected_id": null
+      },
+      "utterance_zh_Hans": "还是刚才那个感觉。",
+      "forbidden_zh_Hans": [
+        "没有上下文时猜测旧效果",
+        "假装记住未提供的图片"
+      ],
+      "utterance": "还是刚才那个感觉。",
+      "forbidden": [
+        "没有上下文时猜测旧效果",
+        "假装记住未提供的图片"
+      ]
+    },
+    {
+      "id": "ZH35",
+      "expected": {
+        "intent_tags": [
+          "reference_color_with_scene_constraints",
+          "preserve_night",
+          "bounded_transfer"
+        ],
+        "preview_policy": "single",
+        "acceptable_style_ids": [
+          "night_atmosphere"
+        ]
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "reference_present": true,
+        "source_scene": "night",
+        "reference_scene": "daylight"
+      },
+      "utterance_zh_Hans": "按我给的清透参考图修，不过我这张是晚上，不要白天感。",
+      "forbidden_zh_Hans": [
+        "复制参考曝光",
+        "把夜景提成白天",
+        "以参考图人物替换本人"
+      ],
+      "utterance": "按我给的清透参考图修，不过我这张是晚上，不要白天感。",
+      "forbidden": [
+        "复制参考曝光",
+        "把夜景提成白天",
+        "以参考图人物替换本人"
+      ]
+    },
+    {
+      "id": "ZH36",
+      "expected": {
+        "intent_tags": [
+          "single_local_cleanup",
+          "preserve_color",
+          "no_new_style"
+        ],
+        "preview_policy": "single"
+      },
+      "evaluation_status": "not_run",
+      "context": {
+        "selected_id": "B",
+        "accepted_baseline_available": true
+      },
+      "utterance_zh_Hans": "颜色已经很满意了，只把右下角一点垃圾擦掉。",
+      "forbidden_zh_Hans": [
+        "新增风格预设",
+        "改变全图颜色",
+        "重新输出风格小样"
+      ],
+      "utterance": "颜色已经很满意了，只把右下角一点垃圾擦掉。",
+      "forbidden": [
+        "新增风格预设",
+        "改变全图颜色",
+        "重新输出风格小样"
+      ]
+    }
+  ],
+  "example_languages": [
+    "zh-Hans",
+    "en-US"
+  ]
+}

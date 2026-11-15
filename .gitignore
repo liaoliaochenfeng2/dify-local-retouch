@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!*.env.example
+*.difypkg
+research/
+validation/
+release/
+.DS_Store

@@ -1,0 +1,45 @@
+version: 0.1.1
+type: plugin
+author: liaoliaochenfeng2
+name: local_retouch
+label:
+  en_US: Local Retouch Studio
+  zh_Hans: 本地智能修图工具
+description:
+  en_US: Local photo styles, reference color matching and retouching with session
+    feedback. No external image API.
+  zh_Hans: 本地 CPU 风格调色、参考图色调匹配与修图，支持短期素材和明确偏好缓存，无需外部图像 API。
+icon: icon.svg
+tags:
+- image
+- productivity
+resource:
+  memory: 1073741824
+  permission:
+    model:
+      enabled: false
+      llm: false
+    endpoint:
+      enabled: false
+    app:
+      enabled: false
+    storage:
+      enabled: true
+      size: 1073741824
+plugins:
+  tools:
+  - provider/local_retouch.yaml
+meta:
+  version: 0.0.1
+  arch:
+  - amd64
+  - arm64
+  runner:
+    language: python
+    version: '3.12'
+    entrypoint: main
+  minimum_dify_version: 1.16.1
+created_at: '2026-11-15T00:00:00Z'
+privacy: PRIVACY.md
+verified: false
+repo: https://github.com/liaoliaochenfeng2/dify-local-retouch
